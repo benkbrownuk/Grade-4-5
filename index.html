@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Place Value Power Lab</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- PWA -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#ff8800">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<style>
+body {
+  font-family: "Comic Sans MS", Arial;
+    background: linear-gradient(135deg,#ffb703,#023047);
+      margin:0;
+        color:white;
+          animation: fadeIn 1s;
+          }
+          .container {
+            max-width:950px;
+              margin:auto;
+                background:#1b263b;
+                  padding:20px;
+                    border-radius:15px;
+                      box-shadow: 0 0 20px rgba(0,0,0,0.5);
+                      }
+                      h1,h2 {text-align:center;color:#ffd166; text-shadow: 2px 2px 4px #000;}
+                      button {
+                        background:#ff8800;
+                          border:none;
+                            padding:12px;
+                              border-radius:10px;
+                                width:100%;
+                                  font-weight:bold;
+                                    cursor:pointer;
+                                      transition: background 0.3s;
+                                      }
+                                      button:hover {background:#e67e00;}
+                                      .card {
+                                        background:#415a77;
+                                          padding:15px;
+                                            border-radius:12px;
+                                              margin-bottom:15px;
+                                                box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+                                                  animation: slideUp 0.5s;
+                                                  }
+                                                  .hidden {display:none}
+                                                  .option {
+                                                    background:#778da9;
+                                                      padding:10px;
+                                                        margin:8px 0;
+                                                          border-radius:8px;
+                                                            cursor:pointer;
+                                                              transition: all 0.3s;
+                                                              }
+                                                              .option:hover {background:#6b7b8c; transform: scale(1.02);}
+                                                              .correct {background:#06d6a0;color:black; animation: pulse 0.5s;}
+                                                              .wrong {background:#ef476f; animation: shake 0.5s;}
+                                                              .place-row {
+                                                                display:flex;
+                                                                  justify-content:space-around;
+                                                                    margin:10px 0;
+                                                                    }
+                                                                    .place {
+                                                                      background:#ffd166;
+                                                                        color:black;
+                                                                          padding:10px;
+                                                                            width:18%;
+                                                                              text-align:center;
+                                                                                border-radius:10px;
+                                                                                  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+                                                                                  }
+                                                                                  .digit {
+                                                                                    font-size:28px;
+                                                                                      animation:bounce 1s infinite;
+                                                                                      }
+                                                                                      @keyframes fadeIn {
+                                                                                        from {opacity:0}
+                                                                                          to {opacity:1}
+                                                                                          }
+                                                                                          @keyframes slideUp {
+                                                                                            from {transform:translateY(20px); opacity:0}
+                                                                                              to {transform:translateY(0); opacity:1}
+                                                                                              }
+                                                                                              @keyframes slideLeft {
+                                                                                                from {transform:translateX(0)}
+                                                                                                  to {transform:translateX(-80px)}
+                                                                                                  }
+                                                                                                  @keyframes bounce {
+                                                                                                    0%,100%{transform:translateY(0)}
+                                                                                                      50%{transform:translateY(-5px)}
+                                                                                                      }
+                                                                                                      @keyframes pulse {
+                                                                                                        0% {transform:scale(1)}
+                                                                                                          50% {transform:scale(1.1)}
+                                                                                                            100% {transform:scale(1)}
+                                                                                                            }
+                                                                                                            @keyframes shake {
+                                                                                                              0%,100% {transform:translateX(0)}
+                                                                                                                25% {transform:translateX(-5px)}
+                                                                                                                  75% {transform:translateX(5px)}
+                                                                                                                  }
+                                                                                                                  .dashboard label {display:block;margin-top:8px}
+                                                                                                                  textarea {width:100%;height:120px;border-radius:8px}
+                                                                                                                  .work {background:#778da9; padding:10px; margin-top:10px; border-radius:8px; white-space:pre-line;}
+                                                                                                                  </style>
+                                                                                                                  </head>
+                                                                                                                  
+                                                                                                                  <body>
+                                                                                                                  <div class="container">
+                                                                                                                  
+                                                                                                                  <h1>🚀 Place Value Power Lab</h1>
+                                                                                                                  
+                                                                                                                  <!-- TEACHER DASHBOARD -->
+                                                                                                                  <div class="card dashboard">
+                                                                                                                  <h2>🧑‍🏫 Teacher Dashboard</h2>
+                                                                                                                  <label><input type="checkbox" id="teachMode" checked> Enable Teaching Mode</label>
+                                                                                                                  <label><input type="checkbox" id="showWork" checked> Show Work Steps</label>
+                                                                                                                  <label><input type="checkbox" id="soundOn" checked> Sound Effects</label>
+                                                                                                                  
+                                                                                                                  <p><strong>Paste New Math Problem:</strong></p>
+                                                                                                                  <textarea id="problemInput" placeholder="Paste problem text here..."></textarea>
+                                                                                                                  <button onclick="generateFromText()">Generate Game</button>
+                                                                                                                  
+                                                                                                                  <p><strong>Or Upload Text File:</strong></p>
+                                                                                                                  <input type="file" id="fileInput" accept=".txt">
+                                                                                                                  <button onclick="generateFromFile()">Generate from File</button>
+                                                                                                                  </div>
+                                                                                                                  
+                                                                                                                  <!-- STUDENT SETUP -->
+                                                                                                                  <div class="card" id="setup">
+                                                                                                                  <input id="studentName" placeholder="Student Name">
+                                                                                                                  <select id="grade">
+                                                                                                                  <option>Grade 1</option>
+                                                                                                                  <option>Grade 2</option>
+                                                                                                                  <option>Grade 3</option>
+                                                                                                                  <option>Grade 4</option>
+                                                                                                                  <option>Grade 5</option>
+                                                                                                                  <option>Grade 6</option>
+                                                                                                                  <option>Grade 7</option>
+                                                                                                                  <option>Grade 8</option>
+                                                                                                                  <option>Grade 9</option>
+                                                                                                                  <option>Grade 10</option>
+                                                                                                                  <option>Grade 11</option>
+                                                                                                                  <option>Grade 12</option>
+                                                                                                                  </select>
+                                                                                                                  <button onclick="start()">Start Game</button>
+                                                                                                                  </div>
+                                                                                                                  
+                                                                                                                  <!-- TEACHING -->
+                                                                                                                  <div id="teach" class="card hidden">
+                                                                                                                  <h2>📘 Learning Step</h2>
+                                                                                                                  <p id="teachText"></p>
+                                                                                                                  
+                                                                                                                  <div class="place-row">
+                                                                                                                  <div class="place">Thousands</div>
+                                                                                                                  <div class="place">Hundreds</div>
+                                                                                                                  <div class="place">Tens</div>
+                                                                                                                  <div class="place">Ones</div>
+                                                                                                                  </div>
+                                                                                                                  
+                                                                                                                  <p id="animationText"></p>
+                                                                                                                  <button onclick="next()">Continue</button>
+                                                                                                                  </div>
+                                                                                                                  
+                                                                                                                  <!-- QUIZ -->
+                                                                                                                  <div id="quiz" class="card hidden">
+                                                                                                                  <h2 id="qText"></h2>
+                                                                                                                  <p id="standard"></p>
+                                                                                                                  <div id="options"></div>
+                                                                                                                  <p id="feedback"></p>
+                                                                                                                  <div id="work" class="hidden work"></div>
+                                                                                                                  <button onclick="next()">Next</button>
+                                                                                                                  </div>
+                                                                                                                  
+                                                                                                                  <!-- SCORE -->
+                                                                                                                  <div id="score" class="card hidden">
+                                                                                                                  <h2>🎉 Finished!</h2>
+                                                                                                                  <p id="final"></p>
+                                                                                                                  <button onclick="generatePDF()">Download PDF Results</button>
+                                                                                                                  </div>
+                                                                                                                  
+                                                                                                                  <audio id="correctSound" src="https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg"></audio>
+                                                                                                                  <audio id="wrongSound" src="https://actions.google.com/sounds/v1/cartoon/boing.ogg"></audio>
+                                                                                                                  <audio id="clickSound" src="https://actions.google.com/sounds/v1/impacts/wood_impact.ogg"></audio>
+                                                                                                                  <audio id="nextSound" src="https://actions.google.com/sounds/v1/ambiences/forest_birds.ogg"></audio>
+                                                                                                                  
+                                                                                                                  </div>
+                                                                                                                  
+                                                                                                                  <script>
+                                                                                                                  let questions=[
+                                                                                                                  {
+                                                                                                                  q: "Which number, when written in standard form, shows a digit with a value that is 10 times the 6 in the ones place?",
+                                                                                                                  options: ["six hundred sixty-two", "six hundred twenty-six", "five hundred sixty-eight", "six hundred sixty-eight"],
+                                                                                                                  answer: 0,
+                                                                                                                  standard: "CC.2.1.4.B.1",
+                                                                                                                  work: "Value of the 6 in the ones place: 6\nTen times that value: 60\nThe tens place in 662 has a 6, which is worth 60"
+                                                                                                                  },
+                                                                                                                  {
+                                                                                                                  q: "Which number, when written in standard form, shows a digit with a value that is 10 times the 7 in the hundreds place?",
+                                                                                                                  options: ["seven thousand seven hundred forty-two", "seven thousand seventy-two", "eight thousand seven hundred twenty-four", "seven thousand seven hundred twenty-four"],
+                                                                                                                  answer: 0,
+                                                                                                                  standard: "CC.2.1.4.B.1",
+                                                                                                                  work: "Value of the 7 in the hundreds place: 700\nTen times that value: 7,000\nThe number shows a 7 in the thousands place (7,000) and a 7 in the hundreds place (700)"
+                                                                                                                  },
+                                                                                                                  {
+                                                                                                                  q: "Which number, when written in standard form, shows a digit with a value that is 10 times the 3 in the tens place?",
+                                                                                                                  options: ["three thousand three hundred thirty-five", "three thousand thirty-five", "three thousand three hundred five", "three thousand three hundred fifty"],
+                                                                                                                  answer: 0,
+                                                                                                                  standard: "CC.2.1.4.B.1",
+                                                                                                                  work: "Value of the 3 in the tens place: 30\nTen times that value: 300\nThe number shows a 3 in the hundreds place (300) and a 3 in the tens place (30)"
+                                                                                                                  }
+                                                                                                                  ];
+                                                                                                                  let index=0,score=0,teachStep=0;
+                                                                                                                  let selectedAnswers = new Array(questions.length).fill(undefined);
+                                                                                                                  
+                                                                                                                  let steps = [
+                                                                                                                  {
+                                                                                                                  text: "Welcome to Place Value! Place value tells us the value of a digit based on its position in a number.",
+                                                                                                                  animation: ""
+                                                                                                                  },
+                                                                                                                  {
+                                                                                                                  text: "For example, in 123, the 1 is in hundreds (100), 2 in tens (20), 3 in ones (3).",
+                                                                                                                  animation: "<div class='place-row'><div class='place'>1<br>Hundreds</div><div class='place'>2<br>Tens</div><div class='place'>3<br>Ones</div></div>"
+                                                                                                                  },
+                                                                                                                  {
+                                                                                                                  text: "When we multiply by 10, the digits move left. A digit in ones becomes tens, tens to hundreds, etc.",
+                                                                                                                  animation: "<span class='digit' style='animation:slideLeft 1s forwards'>5</span> from ones to tens: 5 becomes 50"
+                                                                                                                  },
+                                                                                                                  {
+                                                                                                                  text: "Example: 6 in ones place. Value: 6. 10 times: 60. So in tens place.",
+                                                                                                                  animation: "662 has 6 in tens: 60"
+                                                                                                                  },
+                                                                                                                  {
+                                                                                                                  text: "Another example: 7 in hundreds: 700. 10 times: 7000. So in thousands.",
+                                                                                                                  animation: "7742 has 7 in thousands: 7000"
+                                                                                                                  }
+                                                                                                                  ];
+                                                                                                                  
+                                                                                                                  function generateFromText(){
+                                                                                                                  alert("Game generated with " + questions.length + " problems!");
+                                                                                                                  }
+                                                                                                                  
+                                                                                                                  function generateFromFile(){
+                                                                                                                  let file = document.getElementById("fileInput").files[0];
+                                                                                                                  if(file){
+                                                                                                                  let reader = new FileReader();
+                                                                                                                  reader.onload = function(e){
+                                                                                                                  document.getElementById("problemInput").value = e.target.result;
+                                                                                                                  generateFromText();
+                                                                                                                  };
+                                                                                                                  reader.readAsText(file);
+                                                                                                                  }
+                                                                                                                  }
+                                                                                                                  
+                                                                                                                  function start(){
+                                                                                                                  document.getElementById("setup").classList.add("hidden");
+                                                                                                                  if(document.getElementById("teachMode").checked){
+                                                                                                                  teachStep=0;
+                                                                                                                  document.getElementById("teach").classList.remove("hidden");
+                                                                                                                  teach();
+                                                                                                                  }else showQuiz();
+                                                                                                                  }
+                                                                                                                  
+                                                                                                                  function teach(){
+                                                                                                                  document.getElementById("teachText").innerHTML = steps[teachStep].text;
+                                                                                                                  document.getElementById("animationText").innerHTML = steps[teachStep].animation;
+                                                                                                                  }
+                                                                                                                  
+                                                                                                                  function showQuiz(){
+                                                                                                                  document.getElementById("quiz").classList.remove("hidden");
+                                                                                                                  let q=questions[index];
+                                                                                                                  document.getElementById("qText").innerText=q.q;
+                                                                                                                  document.getElementById("standard").innerText=q.standard;
+                                                                                                                  let opt=document.getElementById("options");
+                                                                                                                  opt.innerHTML="";
+                                                                                                                  q.options.forEach((o,i)=>{
+                                                                                                                  let d=document.createElement("div");
+                                                                                                                  d.className="option";
+                                                                                                                  d.innerText=o;
+                                                                                                                  d.onclick=()=>check(i,d);
+                                                                                                                  opt.appendChild(d);
+                                                                                                                  });
+                                                                                                                  document.getElementById("feedback").innerText="";
+                                                                                                                  document.getElementById("work").classList.add("hidden");
+                                                                                                                  }
+                                                                                                                  
+                                                                                                                  function check(i,el){
+                                                                                                                  let q=questions[index];
+                                                                                                                  selectedAnswers[index] = i;
+                                                                                                                  if(document.getElementById("soundOn").checked){
+                                                                                                                  document.getElementById("clickSound").play();
+                                                                                                                  }
+                                                                                                                  let sound=document.getElementById(i===q.answer?"correctSound":"wrongSound");
+                                                                                                                  if(document.getElementById("soundOn").checked) sound.play();
+                                                                                                                  if(i===q.answer){score++;el.classList.add("correct"); document.getElementById("feedback").innerText="Correct!";}
+                                                                                                                  else {el.classList.add("wrong"); document.getElementById("feedback").innerText="Wrong!";}
+                                                                                                                  if(document.getElementById("showWork").checked){
+                                                                                                                  document.getElementById("work").classList.remove("hidden");
+                                                                                                                  document.getElementById("work").innerText=q.work;
+                                                                                                                  }
+                                                                                                                  }
+                                                                                                                  
+                                                                                                                  function next(){
+                                                                                                                  if(document.getElementById("soundOn").checked){
+                                                                                                                  document.getElementById("nextSound").play();
+                                                                                                                  }
+                                                                                                                  if(document.getElementById("teach").classList.contains("hidden") === false){
+                                                                                                                  teachStep++;
+                                                                                                                  if(teachStep < steps.length){
+                                                                                                                  teach();
+                                                                                                                  } else {
+                                                                                                                  document.getElementById("teach").classList.add("hidden");
+                                                                                                                  showQuiz();
+                                                                                                                  }
+                                                                                                                  } else {
+                                                                                                                  index++;
+                                                                                                                  if(index < questions.length){
+                                                                                                                  showQuiz();
+                                                                                                                  } else {
+                                                                                                                  showScore();
+                                                                                                                  }
+                                                                                                                  }
+                                                                                                                  }
+                                                                                                                  
+                                                                                                                  function showScore(){
+                                                                                                                  document.getElementById("quiz").classList.add("hidden");
+                                                                                                                  document.getElementById("score").classList.remove("hidden");
+                                                                                                                  let name = document.getElementById("studentName").value || "Anonymous";
+                                                                                                                  let grade = document.getElementById("grade").value;
+                                                                                                                  document.getElementById("final").innerHTML = `Student: ${name}, ${grade}<br>Score: ${score}/${questions.length}`;
+                                                                                                                  }
+                                                                                                                  
+                                                                                                                  function generatePDF(){
+                                                                                                                  let name = document.getElementById("studentName").value || "Anonymous";
+                                                                                                                  let grade = document.getElementById("grade").value;
+                                                                                                                  let { jsPDF } = window.jspdf;
+                                                                                                                  let doc = new jsPDF();
+                                                                                                                  doc.text(`Student: ${name}, ${grade}`, 10, 10);
+                                                                                                                  doc.text(`Score: ${score}/${questions.length}`, 10, 20);
+                                                                                                                  let y = 30;
+                                                                                                                  questions.forEach((q,i)=>{
+                                                                                                                  doc.text(`Problem ${i+1}: ${q.q}`, 10, y); y+=10;
+                                                                                                                  doc.text(`Your Answer: ${selectedAnswers[i] !== undefined ? q.options[selectedAnswers[i]] : 'Not answered'}`, 10, y); y+=10;
+                                                                                                                  doc.text(`Correct Answer: ${q.options[q.answer]}`, 10, y); y+=10;
+                                                                                                                  if(selectedAnswers[i] !== q.answer){
+                                                                                                                  doc.text(`Explanation: ${q.work}`, 10, y); y+=10;
+                                                                                                                  }
+                                                                                                                  y+=10;
+                                                                                                                  if(y > 270) { doc.addPage(); y=10; } // page break if needed
+                                                                                                                  });
+                                                                                                                  doc.save('results.pdf');
+                                                                                                                  }
+                                                                                                                  </script>
+                                                                                                                  </body>
+                                                                                                                  </html>
+                                                                                                                  >
